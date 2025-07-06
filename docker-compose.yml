@@ -14,8 +14,8 @@ services:
 
   scheduler:
     build:
-      context: ./
-      dockerfile: scheduler/Dockerfile
+      context: .  # Корень проекта
+      dockerfile: scheduler/Dockerfile  # Путь ОТНОСИТЕЛЬНО корня
     container_name: scheduler
     env_file:
       - .env
