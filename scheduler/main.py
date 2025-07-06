@@ -24,10 +24,11 @@ async def main():
     exchange_name = os.getenv("PROMO_EXCHANGE_NAME")
     exchange = await declare_exchange(rabbitmq_channel, exchange_name)
 
-    print('connected')
-    return
 
     chats = await get_chats()
+
+    print(f"chats: {chats}")
+    return
 
     tasks = []
     for chat in chats:
