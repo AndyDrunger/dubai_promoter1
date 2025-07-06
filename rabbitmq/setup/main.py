@@ -1,84 +1,41 @@
-import os
-import aio_pika
 import asyncio
+import os
+
+import aio_pika
+from aio_pika.abc import AbstractRobustChannel as Channel, AbstractRobustExchange as Exchange, \
+    AbstractRobustQueue as Queue
 from dotenv import load_dotenv
 
+from rabbitmq.main import get_channel
 
-async def setup_rabbitmq():
-    await asyncio.sleep(3)
-    load_dotenv()
+load_dotenv()
 
-    connection = await aio_pika.connect_robust(
-        f"amqp://{os.getenv('RABBIT_USER')}:{os.getenv('RABBIT_PASS')}@"
-        f"{os.getenv('RABBIT_HOST')}:{os.getenv('RABBIT_PORT')}/"
-    )
+exchange_name = os.getenv("PROMO_EXCHANGE_NAME")
 
-    async with connection:
-        channel = await connection.channel()
+queues_names = ['ask', 'response', 'reaction']
 
-        # Основной обменник
-        exchange = await channel.declare_exchange(
-            "promo_dubai",
-            aio_pika.ExchangeType.DIRECT,
-            durable=True
-        )
 
-        # 1. Очередь для входящих сообщений (to_ask)
-        to_ask_queue = await channel.declare_queue(
-            "to_ask",
-            durable=True
-        )
-        await to_ask_queue.bind(exchange, routing_key="to_ask")
+async def declare_exchange(channel: Channel, name: str, ex_type=aio_pika.ExchangeType.DIRECT) -> Exchange:
+    return await channel.declare_exchange(name, ex_type, durable=True)
 
-        # 2. Очередь с TTL и DLX (ask)
-        ask_queue = await channel.declare_queue(
-            "ask",
-            durable=True,
-            arguments={
-                "x-dead-letter-exchange": "ttl.dlx",
-                "x-dead-letter-routing-key": "to_response"  # Важно добавить!
-            }
-        )
-        await ask_queue.bind(exchange, routing_key="ask")
 
-        # 3. Dead-letter exchange
-        dlx_exchange = await channel.declare_exchange(
-            "ttl.dlx",
-            aio_pika.ExchangeType.DIRECT,  # Изменено с FANOUT на DIRECT
-            durable=True
-        )
+async def declare_queue(channel: Channel, name: str) -> Queue:
+    return await channel.declare_queue(name, durable=True)
 
-        # 4. Очередь для сообщений после TTL (to_response)
-        to_response_queue = await channel.declare_queue(
-            "to_response",
-            durable=True
-        )
-        await to_response_queue.bind(dlx_exchange, routing_key="to_response")
 
-        # 5. Очередь с TTL и DLX (reaction)
-        reaction_queue = await channel.declare_queue(
-            "reaction",
-            durable=True,
-            arguments={
-                "x-dead-letter-exchange": "ttl.dlx",
-                "x-dead-letter-routing-key": "to_reaction"  # Важно добавить!
-            }
-        )
-        await reaction_queue.bind(exchange, routing_key="reaction")
+async def bind_queue(queue: Queue, exchange: Exchange, routing_key: str):
+    await queue.bind(exchange, routing_key=routing_key)
 
-        # 4. Очередь для сообщений после TTL (to_response)
-        to_reaction_queue = await channel.declare_queue(
-            "to_reaction",
-            durable=True
-        )
-        await to_reaction_queue.bind(dlx_exchange, routing_key="to_reaction")
 
-        print("RabbitMQ setup completed successfully")
+async def main():
+    channel = await get_channel()
+
+    promo_exchange = await declare_exchange(channel, exchange_name)
+
+    for queue_name in queues_names:
+        queue = await declare_queue(channel, queue_name)
+        await bind_queue(queue, promo_exchange, queue_name)
+
 
 if __name__ == "__main__":
-    asyncio.run(setup_rabbitmq())
-    # Keep the container running
-    # import time
-    # print("Setup complete, keeping container alive...")
-    # while True:
-    #     time.sleep(60)
+    asyncio.run(main())

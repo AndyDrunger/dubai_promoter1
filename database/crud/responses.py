@@ -8,4 +8,5 @@ async def create_response(text: str):
             response = ResponsesModel(text=text)
             session.add(response)
         await session.refresh(response)
+
         return response

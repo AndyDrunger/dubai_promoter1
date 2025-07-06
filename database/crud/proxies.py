@@ -10,6 +10,7 @@ async def create_proxy(addr: str, port: int, country: str, proxy_type: str = Non
                                country=country, username=username, password=password, rdns=rdns)
             session.add(proxy)
         await session.refresh(proxy)
+
         return proxy
 
 

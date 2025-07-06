@@ -10,4 +10,5 @@ async def create_profile(first_name: str, last_name: str = None, user_name: str 
                                     user_name=user_name, about=about, status=status)
             session.add(profile)
         await session.refresh(profile)
+
         return profile

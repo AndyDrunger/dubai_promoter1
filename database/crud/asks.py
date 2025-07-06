@@ -8,4 +8,5 @@ async def create_ask(text: str):
             ask = AsksModel(text=text)
             session.add(ask)
         await session.refresh(ask)
+
         return ask
