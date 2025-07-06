@@ -1,0 +1,97 @@
+services:
+
+#  prisma-generator:
+#    build:
+#      context: ./
+#      dockerfile: prisma/Dockerfile
+#    volumes:
+#      - prisma-client:/app/prisma/generated_client
+
+  rabbitmq_setup:
+    build:
+      context: ./
+      dockerfile: rabbitmq/setup/Dockerfile
+    container_name: rabbitmq_setup
+    env_file:
+      - .env
+    networks:
+#      - medpalm_promo
+      - rabbitmq
+
+  chat_monitoring:
+    build:
+      context: ./
+      dockerfile: main_app/chat_monitoring/Dockerfile
+    container_name: chat_monitoring
+    env_file:
+      - .env
+    networks:
+      - rabbitmq
+
+
+
+  ask:
+    build:
+      context: ./
+      dockerfile: main_app/ask/Dockerfile
+    container_name: ask
+    env_file:
+      - .env
+    networks:
+#      - medpalm_promo
+      - rabbitmq
+#    volumes:
+#      - ./main_app/telethon/sessions:/app/main_app/telethon/sessions
+#      - prisma-client:/app/prisma/generated_client
+#    depends_on:
+#      - prisma-generator
+
+
+
+  response:
+    build:
+      context: ./
+      dockerfile: main_app/response/Dockerfile
+    container_name: response
+    env_file:
+      - .env
+    networks:
+#      - medpalm_promo
+      - rabbitmq
+    ports:
+      - "7000:7000"
+    volumes:
+      - ./main_app/telethon/sessions:/app/main_app/telethon/sessions
+#      - prisma-client:/app/prisma/generated_client
+
+  reaction:
+    build:
+      context: ./
+      dockerfile: main_app/reaction/Dockerfile
+    container_name: reaction
+    env_file:
+      - .env
+    networks:
+#      - medpalm_promo
+      - rabbitmq
+
+  chat_joiner:
+    build:
+      context: ./
+      dockerfile: main_app/chat_joiner/Dockerfile
+    container_name: chat_joiner
+    env_file:
+      - .env
+    networks:
+      #      - medpalm_promo
+      - rabbitmq
+
+
+
+networks:
+  rabbitmq:
+    external: true  # Используем существующую сеть
+    name: rabbitmq  # Указываем то же имя
+
+#volumes:
+#  prisma-client:
