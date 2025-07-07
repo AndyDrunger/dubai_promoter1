@@ -4,10 +4,11 @@ WORKDIR /app
 
 COPY .env ./
 
-COPY rabbitmq/setup/requirements.txt ./
+COPY rabbitmq/ ./rabbitmq/
+
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY rabbitmq/main.py ./rabbitmq/
 COPY rabbitmq/setup/main.py ./
 
 CMD ["python", "main.py"]

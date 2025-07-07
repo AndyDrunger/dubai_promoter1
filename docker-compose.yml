@@ -1,15 +1,15 @@
 services:
 
 
-#  rabbitmq_setup:
-#    build:
-#      context: ./
-#      dockerfile: rabbitmq/setup/Dockerfile
-#    container_name: rabbitmq_setup
-#    env_file:
-#      - .env
-#    networks:
-#      - rabbitmq_net
+  rabbitmq_setup:
+    build:
+      context: .
+      dockerfile: rabbitmq/setup/Dockerfile
+    container_name: rabbitmq_setup
+    env_file:
+      - .env
+    networks:
+      - rabbitmq_net
 
 
   scheduler:

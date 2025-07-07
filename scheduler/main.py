@@ -26,8 +26,7 @@ async def main():
 
 
     chats = await get_chats()
-
-    print(f"chats: {chats}")
+    print(chats)
     return
 
     tasks = []
