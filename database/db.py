@@ -11,7 +11,10 @@ from sqlalchemy.orm import DeclarativeBase
 
 async_engine = create_async_engine(
     os.getenv("POSTGRES_AWS_URL"),
-    echo=False
+    echo=False,
+    pool_size=60,  # базовых соединений
+    max_overflow=20,  # дополнительных
+    pool_timeout=30,
 )
 
 async_session: async_sessionmaker[AsyncSession] = async_sessionmaker(async_engine)
