@@ -20,7 +20,7 @@ async def get_promo_scripts() -> list[PromoScript]:
     async with async_session() as session:
         query = select(AsksResponsesModel)
         result = await session.execute(query)
-        asks_responses_models = result.scalars().all()
+        asks_responses_models = result.unique().scalars().all()
 
         return [map_asks_responses_to_promo_script(ar) for ar in asks_responses_models]
 
