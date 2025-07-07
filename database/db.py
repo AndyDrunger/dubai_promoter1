@@ -10,7 +10,7 @@ from sqlalchemy.orm import DeclarativeBase
 # не импортируйте models и init_db здесь
 
 async_engine = create_async_engine(
-    os.getenv("POSTGRES_LOCAL_URL"),
+    os.getenv("POSTGRES_AWS_URL"),
     echo=True
 )
 
