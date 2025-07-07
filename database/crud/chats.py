@@ -31,6 +31,6 @@ async def get_chat(id: int) -> Chat:
     async with async_session() as session:
         query = select(ChatsModel).where(ChatsModel.id == id)
         result = await session.execute(query)
-        chat_model = result.scalars().one()
+        chat_model = result.unique().scalars().one()
 
         return map_model_to_business(chat_model, Chat)

@@ -29,6 +29,6 @@ async def get_promo_script(id: int) -> PromoScript:
     async with async_session() as session:
         query = select(AsksResponsesModel).where(AsksResponsesModel.id == id)
         result = await session.execute(query)
-        asks_responses_model = result.scalars().one()
+        asks_responses_model = result.unique().scalars().one()
 
         return map_asks_responses_to_promo_script(asks_responses_model)
