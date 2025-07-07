@@ -28,11 +28,6 @@ load_dotenv()
 
 async def startup():
 
-    accs = await get_accs()
-    print(accs)
-    return
-
-
     rabbitmq_channel = await get_channel()
     exchange_name = os.getenv("PROMO_EXCHANGE_NAME")
     exchange = await declare_exchange(rabbitmq_channel, exchange_name)
@@ -45,6 +40,9 @@ async def startup():
 
 async def main(payload: dict, exchange: AbstractRobustExchange):
     chat_id, promo_script_id = parse_payload(payload)
+
+    print(f'chat_id: {chat_id}, promo_script_id: {promo_script_id}')
+    return
 
     accs = await get_accs()
 
