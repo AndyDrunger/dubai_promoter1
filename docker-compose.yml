@@ -22,16 +22,16 @@ services:
     networks:
       - rabbitmq_net
 
-#
-#  asker:
-#    build:
-#      context: ./
-#      dockerfile: asker/Dockerfile
-#    container_name: asker
-#    env_file:
-#      - .env
-#    networks:
-#      - rabbitmq_net
+
+  asker:
+    build:
+      context: .
+      dockerfile: asker/Dockerfile
+    container_name: asker
+    env_file:
+      - .env
+    networks:
+      - rabbitmq_net
 #
 #
 #  responseer:

@@ -8,10 +8,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY .env ./
 
 COPY my_logger.py ./
-COPY classes ./classes
-COPY database ./database
-COPY rabbitmq ./rabbitmq
-COPY telegram ./telegram
+COPY classes/ ./classes/
+COPY database/ ./database/
+COPY rabbitmq/ ./rabbitmq/
+COPY telegram/ ./telegram/
 
 COPY asker/main.py ./
 
