@@ -62,9 +62,6 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
     chat, promo_script = await load_entities(chat_id, promo_script_id)
     client = await create_tg_client(acc)
 
-    print(acc.proxy)
-    return
-
     msg = await send_message(
         client=client,
         chat=chat,
