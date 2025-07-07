@@ -13,7 +13,7 @@ async def process_msg(msg: AbstractIncomingMessage, handler_func: Callable[[dict
         payload = pickle.loads(msg.body)
         await handler_func(payload)
 
-        await msg.ack()
+        # await msg.ack()
         # Добавить трай эксепт. При исключении вызывать нак. при успешном трайе, ак автоматом сделается
 
 

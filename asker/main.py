@@ -43,7 +43,6 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
 
     print(f'chat_id: {chat_id}, promo_script_id: {promo_script_id}')
     return
-    None
 
     accs = await get_accs()
 
