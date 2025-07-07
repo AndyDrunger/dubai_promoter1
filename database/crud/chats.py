@@ -22,7 +22,7 @@ async def get_chats() -> list[Chat]:
     async with async_session() as session:
         query = select(ChatsModel)
         result = await session.execute(query)
-        chat_models = result.scalars().all()
+        chat_models = result.unique().scalars().all()
 
         return [map_model_to_business(chat, Chat) for chat in chat_models]
 
