@@ -18,4 +18,4 @@ class Proxy:
 
 
     def to_tuple(self) -> tuple:
-        return self.type, self.addr, self.port, self.username, self.password
+        return (self.addr, self.port, True, self.username, self.password)
