@@ -41,9 +41,6 @@ async def startup():
 async def main(payload: dict, exchange: AbstractRobustExchange):
     chat_id, promo_script_id = parse_payload(payload)
 
-    print(f'chat_id: {chat_id}, promo_script_id: {promo_script_id}')
-    return
-
     accs = await get_accs()
 
 
@@ -59,6 +56,10 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         raise
 
     acc = random.choice(eligible_accs)
+
+    print(acc)
+    return
+
     await update_acc_status(acc_id=acc.id, status=AccStatus.working)
 
     chat, promo_script = await load_entities(chat_id, promo_script_id)
