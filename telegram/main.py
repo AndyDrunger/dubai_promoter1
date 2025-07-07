@@ -12,7 +12,7 @@ async def create_tg_client(acc: Acc) -> TelegramClient:
         session=acc.string_session,
         api_id=acc.api_id,
         api_hash=acc.api_hash,
-        proxy=acc.proxy.to_tuple(),
+        proxy=acc.proxy.to_dict(),
     )
 
     return client
