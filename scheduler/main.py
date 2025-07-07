@@ -26,8 +26,6 @@ async def main():
 
 
     chats = await get_chats()
-    print(chats)
-    return
 
     tasks = []
     for chat in chats:
@@ -43,7 +41,7 @@ async def schedule(chat_id: int, exchange: Exchange):
         max = int(os.getenv('SCHEDULER_TIMEOUT_MAX'))
         timeout = random.randint(min, max)
         print(f'Timeout {timeout} sec for chat {chat_id}')
-        await asyncio.sleep(timeout)
+        # await asyncio.sleep(timeout)
 
         promo_scrips = await get_promo_scripts()
         random_promo_script = random.choice(promo_scrips)
