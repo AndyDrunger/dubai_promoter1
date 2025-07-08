@@ -38,6 +38,7 @@ async def main(payload: dict):
     ask_acc_id = promo_script_data['ask_acc_id']
     response_msg_id = promo_script_data['response_msg_id']
 
+
     print(f'Chat ID: {chat_id}, Promo script: {promo_script_data}')
 
     acc = await get_acc(ask_acc_id)

@@ -11,6 +11,7 @@ from classes.chat import Chat
 from classes.promo_script import PromoScript
 from database.crud.asks_responses import get_promo_scripts
 from database.crud.chats import get_chats
+from my_logger import logger
 from rabbitmq.main import get_channel
 from rabbitmq.producer.main import publish_msg
 from rabbitmq.setup.main import declare_exchange
@@ -40,7 +41,9 @@ async def schedule(chat_id: int, exchange: Exchange):
         min = int(os.getenv('SCHEDULER_TIMEOUT_MIN'))
         max = int(os.getenv('SCHEDULER_TIMEOUT_MAX'))
         timeout = random.randint(min, max)
-        print(f'Timeout {timeout} sec for chat {chat_id}')
+
+        logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
+
         await asyncio.sleep(timeout)
 
         promo_scrips = await get_promo_scripts()
