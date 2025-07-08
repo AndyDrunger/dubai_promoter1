@@ -72,6 +72,7 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
     payload = {
         'chat_id': chat.id,
         'promo_script': {
+            'id': promo_script.id,
             'response_msg_id': msg.id,
             'ask_acc_id': promo_script.ask_acc_id,
             'ask_msg_id': promo_script.ask_msg_id,
