@@ -78,8 +78,6 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         },
     }
 
-    print(payload)
-
     timeout = random.randint(int(os.getenv('RESPONSE_TIMEOUT_MIN')), int(os.getenv('RESPONSE_TIMEOUT_MAX')))
     # await asyncio.sleep(timeout)
 
@@ -102,8 +100,8 @@ async def load_entities(chat_id: int, promo_script_id: int) -> tuple[Chat, Promo
 
 async def send_message(client: TelegramClient, chat: Chat, text: str, acc_id: int) -> Message | None:
     try:
-        await client.connect()
-        msg = await client.send_message('sofia_viskonti', text)
+        async with client:
+            msg = await client.send_message('promo_SCRIPT', text)
         # msg = await client.send_message(chat.sg_id, text)
         # await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
@@ -130,8 +128,6 @@ async def send_message(client: TelegramClient, chat: Chat, text: str, acc_id: in
         # await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.problem)
         # await update_acc_status(acc_id=acc_id, status=AccStatus.free)
         raise
-    finally:
-        await client.disconnect()
 
     return msg
 

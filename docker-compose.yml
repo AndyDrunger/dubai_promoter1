@@ -32,17 +32,17 @@ services:
       - .env
     networks:
       - rabbitmq_net
-#
-#
-#  responseer:
-#    build:
-#      context: ./
-#      dockerfile: responser/Dockerfile
-#    container_name: responser
-#    env_file:
-#      - .env
-#    networks:
-#      - rabbitmq_net
+
+
+  responser:
+    build:
+      context: .
+      dockerfile: responser/Dockerfile
+    container_name: responser
+    env_file:
+      - .env
+    networks:
+      - rabbitmq_net
 #
 #
 #
