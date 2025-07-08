@@ -56,6 +56,8 @@ async def schedule(chat_id: int, exchange: Exchange):
 
         await publish_msg(payload=payload, routing_key=os.getenv('ASK_QUEUE_ROUTING_KEY'), exchange=exchange)
 
+        return
+
 
 
 if __name__ == '__main__':
