@@ -42,6 +42,8 @@ async def schedule(chat_id: int, exchange: Exchange):
         max = int(os.getenv('SCHEDULER_TIMEOUT_MAX'))
         timeout = random.randint(min, max)
 
+        await asyncio.sleep(random.randint(1, 10))
+
         logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
 
         promo_scrips = await get_promo_scripts()
