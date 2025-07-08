@@ -34,6 +34,8 @@ async def startup():
 
     async def wrapped_main(payload: dict):
         try:
+            logger.info('new_message')
+
             await main(payload, exchange)
         except RuntimeError as e:
             logger.error(str(e))
