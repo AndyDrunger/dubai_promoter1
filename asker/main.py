@@ -57,7 +57,7 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
 
     acc = random.choice(eligible_accs)
 
-    # await update_acc_status(acc_id=acc.id, status=AccStatus.working)
+    await update_acc_status(acc_id=acc.id, status=AccStatus.working)
 
     chat, promo_script = await load_entities(chat_id, promo_script_id)
     client = await create_tg_client(acc)
@@ -100,33 +100,31 @@ async def load_entities(chat_id: int, promo_script_id: int) -> tuple[Chat, Promo
 
 async def send_message(client: TelegramClient, chat: Chat, text: str, acc_id: int) -> Message | None:
     try:
-        await client.connect()
-        msg = await client.send_message('promo_SCRIPT', text)
-        # msg = await client.send_message(chat.sg_id, text)
-        # await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+        msg = await client.send_message(chat.sg_id, text)
+        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
-    # except RPCError as e:
-    #     if 'RPCError 403: CHAT_SEND_PLAIN_FORBIDDEN (caused by SendMessageRequest)' in str(e):
-    #         logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - JOINED BUT CANT SEND MESSAGE", e)
-    #         await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.muted)
-    #         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-    #
-    #     elif "You can't write in this chat (caused by SendMessageRequest)" in str(e):
-    #         logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - JOIN REQUEST NOT ACCEPTED YET", e)
-    #         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-    #
-    #     elif 'The channel specified is private and you lack permission to access it. Another reason may be that you were banned from it (caused by SendMessageRequest)' in str(
-    #             e):
-    #         logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - KICKED FROM CHAT", e)
-    #         await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.kicked)
-    #         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-    #
-    #     raise
-    #
+    except RPCError as e:
+        if 'RPCError 403: CHAT_SEND_PLAIN_FORBIDDEN (caused by SendMessageRequest)' in str(e):
+            logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - JOINED BUT CANT SEND MESSAGE", e)
+            await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.muted)
+            await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+
+        elif "You can't write in this chat (caused by SendMessageRequest)" in str(e):
+            logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - JOIN REQUEST NOT ACCEPTED YET", e)
+            await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+
+        elif 'The channel specified is private and you lack permission to access it. Another reason may be that you were banned from it (caused by SendMessageRequest)' in str(
+                e):
+            logger.warning(f"ACC_ID: {acc_id} - CHAT_ID: {chat.id} - KICKED FROM CHAT", e)
+            await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.kicked)
+            await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+
+        raise
+
     except Exception as e:
         logger.error(f'Cant send message, acc_id: {acc_id}, chat_id: {chat.id}', e)
-        # await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.problem)
-        # await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+        await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.problem)
+        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
         raise
 
     finally:

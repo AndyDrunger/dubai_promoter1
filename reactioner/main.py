@@ -54,7 +54,7 @@ async def main(payload: dict):
         raise
 
 
-    # await update_acc_status(acc_id=acc.id, status=AccStatus.working)
+    await update_acc_status(acc_id=acc.id, status=AccStatus.working)
 
     chat = await load_entities(chat_id)
     client = await create_tg_client(acc)
@@ -90,21 +90,21 @@ async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, respons
             reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
         ))
 
-    #     reaction = await client(SendReactionRequest(
-    #         peer=chat.sg_id,  # может быть ID, username или объект чата
-    #         msg_id=response_msg_id,  # ID сообщения
-    #         reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
-    #     ))
-    #     await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-    #
-    # except MessageIdInvalidError as e:
-    #     # print(f'Message id invalid, acc_id: {acc_id}, chat_id: {chat.id}', e)
-    #     await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-    #     raise
+        reaction = await client(SendReactionRequest(
+            peer=chat.sg_id,  # может быть ID, username или объект чата
+            msg_id=response_msg_id,  # ID сообщения
+            reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
+        ))
+        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+
+    except MessageIdInvalidError as e:
+        print(f'Message id invalid, acc_id: {acc_id}, chat_id: {chat.id}', e)
+        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+        raise
 
     except Exception as e:
         print(f'Cant send reaction, acc_id: {acc_id}, chat_id: {chat.id}', e)
-        # await update_acc_status(acc_id=acc_id, status=AccStatus.problem)
+        await update_acc_status(acc_id=acc_id, status=AccStatus.problem)
         raise
 
     finally:
@@ -114,7 +114,7 @@ async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, respons
 
 
 def get_emoji():
-    emojis = ['👍', '❤', '🙏', '🫶']
+    emojis = ['👍', '❤', '🙏']
     emoji = random.choice(emojis)
     return emoji
 
