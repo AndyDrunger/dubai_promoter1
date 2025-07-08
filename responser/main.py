@@ -32,7 +32,18 @@ async def startup():
     exchange = await declare_exchange(rabbitmq_channel, exchange_name)
 
     async def wrapped_main(payload: dict):
-        await main(payload, exchange)
+        max_retries = 3
+        retries = 0
+        while retries < max_retries:
+            try:
+                await main(payload, exchange)
+                return  # Успешно отработали, выходим из цикла
+            except RuntimeError as e:
+                logger.error(f"{e} — попытка повторного запуска #{retries + 1}")
+                retries += 1
+                await asyncio.sleep(100)  # Можно паузу добавить перед повтором
+        logger.error(f"Превышено число повторных попыток для payload: {payload}")
+        return
 
     await consume_queue(wrapped_main, queue_name=os.getenv("RESPONSE_QUEUE_NAME"))
 
@@ -69,12 +80,12 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         acc_id=acc.id
     )
 
-    asyncio.create_task(post_work(
+    await post_work(
         chat=chat,
         promo_script=promo_script,
         msg=msg,
         exchange=exchange,
-    ))
+    )
 
     # payload = {
     #     'chat_id': chat.id,
@@ -167,12 +178,12 @@ async def post_work(chat: Chat, promo_script: PromoScript, msg, exchange: Abstra
 
     timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
     logger.info(f'Chat ID: {chat.id}, timeout: {timeout}')
-    await asyncio.sleep(timeout)
 
     await publish_msg(
         exchange=exchange,
         payload=payload,
-        routing_key=os.getenv('REACTION_QUEUE_ROUTING_KEY')
+        routing_key=os.getenv('REACTION_DELAY_QUEUE_ROUTING_KEY'),
+        ttl_sec=timeout,
     )
 
 

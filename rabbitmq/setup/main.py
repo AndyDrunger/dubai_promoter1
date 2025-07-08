@@ -12,15 +12,25 @@ load_dotenv()
 
 exchange_name = os.getenv("PROMO_EXCHANGE_NAME")
 
-queues_names = ['ask', 'response', 'reaction']
-
+queues_names = ['ask', 'response', 'reaction', 'ask_delay', 'response_delay', 'reaction_delay']
 
 async def declare_exchange(channel: Channel, name: str, ex_type=aio_pika.ExchangeType.DIRECT) -> Exchange:
     return await channel.declare_exchange(name, ex_type, durable=True)
 
 
 async def declare_queue(channel: Channel, name: str) -> Queue:
-    return await channel.declare_queue(name, durable=True)
+
+    args = None
+
+    if name.endswith('_delay'):
+        base_name = name.replace('_delay', '')
+        args = {
+            "x-dead-letter-exchange": exchange_name,
+            "x-dead-letter-routing-key": base_name,
+        }
+
+
+    return await channel.declare_queue(name, durable=True, arguments=args)
 
 
 async def bind_queue(queue: Queue, exchange: Exchange, routing_key: str):
