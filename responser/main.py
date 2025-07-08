@@ -80,6 +80,8 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         acc_id=acc.id
     )
 
+    logger.info(f"ACC_ID: {acc.id} - CHAT_ID: {chat.id} - SUCCESSFUL SENT RESPONSE: {promo_script.response.text}")
+
     await post_work(
         chat=chat,
         promo_script=promo_script,

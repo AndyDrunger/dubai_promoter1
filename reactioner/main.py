@@ -17,6 +17,7 @@ from database.crud.accs import get_accs, update_acc_status, get_acc
 from database.crud.accs_chats import update_acc_chat_status
 from database.crud.asks_responses import get_promo_script
 from database.crud.chats import get_chat
+from my_logger import logger
 from rabbitmq.consumer.main import consume_queue
 from rabbitmq.main import get_channel
 from rabbitmq.producer.main import publish_msg
@@ -68,6 +69,9 @@ async def main(payload: dict):
         response_msg_id=response_msg_id,
         emoji=emoji
     )
+
+    logger.info(f"ACC_ID: {acc.id} - CHAT_ID: {chat.id} - SUCCESSFUL SENT REACTION: {response_msg_id}")
+
 
 
 def parse_payload(payload: dict) -> tuple[int, dict]:
