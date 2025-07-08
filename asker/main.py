@@ -100,7 +100,8 @@ async def load_entities(chat_id: int, promo_script_id: int) -> tuple[Chat, Promo
 
 async def send_message(client: TelegramClient, chat: Chat, text: str, acc_id: int) -> Message | None:
     try:
-        msg = await client.send_message(chat.sg_id, text)
+        msg = await client.send_message('promo_script', text)
+        # msg = await client.send_message(chat.sg_id, text)
         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
     except RPCError as e:
