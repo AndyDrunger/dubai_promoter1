@@ -9,7 +9,7 @@ from telethon.errors import RPCError
 from telethon.tl.types import Message
 
 from my_logger import logger
-from classes.acc import AccStatus
+from classes.acc import AccStatus, Acc
 from classes.acc_chat import AccChatStatus
 from classes.chat import Chat
 from classes.promo_script import PromoScript
@@ -69,26 +69,34 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         acc_id=acc.id
     )
 
-    payload = {
-        'chat_id': chat.id,
-        'promo_script': {
-            'id': promo_script.id,
-            'ask_msg_id': msg.id,
-            'ask_acc_id': acc.id,
-        },
-    }
-
-    timeout = random.randint(int(os.getenv('RESPONSE_TIMEOUT_MIN')), int(os.getenv('RESPONSE_TIMEOUT_MAX')))
-
-    logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
-
-    await asyncio.sleep(timeout)
-
-    await publish_msg(
+    asyncio.create_task(post_work(
+        chat=chat,
+        promo_script=promo_script,
+        msg=msg,
+        acc=acc,
         exchange=exchange,
-        payload=payload,
-        routing_key=os.getenv('RESPONSE_QUEUE_ROUTING_KEY')
-    )
+    ))
+
+    # payload = {
+    #     'chat_id': chat.id,
+    #     'promo_script': {
+    #         'id': promo_script.id,
+    #         'ask_msg_id': msg.id,
+    #         'ask_acc_id': acc.id,
+    #     },
+    # }
+    #
+    # timeout = random.randint(int(os.getenv('RESPONSE_TIMEOUT_MIN')), int(os.getenv('RESPONSE_TIMEOUT_MAX')))
+    #
+    # logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
+    #
+    # await asyncio.sleep(timeout)
+    #
+    # await publish_msg(
+    #     exchange=exchange,
+    #     payload=payload,
+    #     routing_key=os.getenv('RESPONSE_QUEUE_ROUTING_KEY')
+    # )
 
 
 def parse_payload(payload: dict) -> tuple[int, int]:
@@ -136,6 +144,29 @@ async def send_message(client: TelegramClient, chat: Chat, text: str, acc_id: in
         await client.disconnect()
 
     return msg
+
+
+async def post_work(chat: Chat, promo_script: PromoScript, msg, acc: Acc, exchange: AbstractRobustExchange) -> Message | None:
+    payload = {
+        'chat_id': chat.id,
+        'promo_script': {
+            'id': promo_script.id,
+            'ask_msg_id': msg.id,
+            'ask_acc_id': acc.id,
+        },
+    }
+
+    timeout = random.randint(int(os.getenv('RESPONSE_TIMEOUT_MIN')), int(os.getenv('RESPONSE_TIMEOUT_MAX')))
+
+    logger.info(f'Chat ID: {chat.id}, timeout: {timeout}')
+
+    await asyncio.sleep(timeout)
+
+    await publish_msg(
+        exchange=exchange,
+        payload=payload,
+        routing_key=os.getenv('RESPONSE_QUEUE_ROUTING_KEY')
+    )
 
 
 if __name__ == '__main__':

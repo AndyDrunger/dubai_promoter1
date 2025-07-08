@@ -69,23 +69,30 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
         acc_id=acc.id
     )
 
-    payload = {
-        'chat_id': chat.id,
-        'promo_script': {
-            'response_msg_id': msg.id,
-            'ask_acc_id': promo_script.ask_acc_id,
-        },
-    }
-
-    timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
-    logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
-    await asyncio.sleep(timeout)
-
-    await publish_msg(
+    asyncio.create_task(post_work(
+        chat=chat,
+        promo_script=promo_script,
+        msg=msg,
         exchange=exchange,
-        payload=payload,
-        routing_key=os.getenv('REACTION_QUEUE_ROUTING_KEY')
-    )
+    ))
+
+    # payload = {
+    #     'chat_id': chat.id,
+    #     'promo_script': {
+    #         'response_msg_id': msg.id,
+    #         'ask_acc_id': promo_script.ask_acc_id,
+    #     },
+    # }
+    #
+    # timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
+    # logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
+    # await asyncio.sleep(timeout)
+    #
+    # await publish_msg(
+    #     exchange=exchange,
+    #     payload=payload,
+    #     routing_key=os.getenv('REACTION_QUEUE_ROUTING_KEY')
+    # )
 
 
 def parse_payload(payload: dict) -> tuple[int, dict]:
@@ -147,6 +154,26 @@ def get_link_on_message(chat: Chat, message_id: int):
         return f'https://t.me/{chat.username}/{message_id}'
     elif not chat.username:
         return f'https://t.me/c/{chat.id}/{message_id}'
+
+
+async def post_work(chat: Chat, promo_script: PromoScript, msg, exchange: AbstractRobustExchange):
+    payload = {
+        'chat_id': chat.id,
+        'promo_script': {
+            'response_msg_id': msg.id,
+            'ask_acc_id': promo_script.ask_acc_id,
+        },
+    }
+
+    timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
+    logger.info(f'Chat ID: {chat.id}, timeout: {timeout}')
+    await asyncio.sleep(timeout)
+
+    await publish_msg(
+        exchange=exchange,
+        payload=payload,
+        routing_key=os.getenv('REACTION_QUEUE_ROUTING_KEY')
+    )
 
 
 if __name__ == '__main__':

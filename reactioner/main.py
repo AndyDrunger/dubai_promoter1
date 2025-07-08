@@ -69,8 +69,6 @@ async def main(payload: dict):
         emoji=emoji
     )
 
-    return
-
 
 def parse_payload(payload: dict) -> tuple[int, dict]:
     return payload['chat_id'], payload['promo_script']
@@ -118,6 +116,8 @@ def get_emoji():
     emojis = ['👍', '❤', '🙏']
     emoji = random.choice(emojis)
     return emoji
+
+
 
 
 if __name__ == '__main__':
