@@ -102,8 +102,8 @@ async def load_entities(chat_id: int, promo_script_data: dict) -> tuple[Chat, Pr
 
 async def send_message(client: TelegramClient, chat: Chat, promo_script: PromoScript, acc_id: int) -> Message | None:
     try:
-        async with client:
-            msg = await client.send_message('promo_SCRIPT', reply_to=promo_script.ask_msg_id, message=promo_script.response.text)
+        await client.connect()
+        msg = await client.send_message('promo_SCRIPT', reply_to=promo_script.ask_msg_id, message=promo_script.response.text)
     #     msg = await client.send_message(chat.sg_id, reply_to=promo_script.ask_msg_id, message=promo_script.response.text)
     #     await update_acc_status(acc_id=acc_id, status=AccStatus.free)
     #
@@ -130,6 +130,9 @@ async def send_message(client: TelegramClient, chat: Chat, promo_script: PromoSc
         # await update_acc_chat_status(acc_id=acc_id, chat_id=chat.id, status=AccChatStatus.problem)
         # await update_acc_status(acc_id=acc_id, status=AccStatus.free)
         raise
+
+    finally:
+        await client.disconnect()
 
     return msg
 
