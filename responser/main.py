@@ -105,6 +105,10 @@ async def send_message(client: TelegramClient, chat: Chat, promo_script: PromoSc
         msg = await client.send_message('promo_script', reply_to=promo_script.ask_msg_id, message=promo_script.response.text)
 
         # msg = await client.send_message(chat.sg_id, reply_to=promo_script.ask_msg_id, message=promo_script.response.text)
+
+        my_chat_msg = await client.send_message(-1002637664833, get_link_on_message(chat, msg.id))
+
+
         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
     except RPCError as e:
@@ -135,6 +139,13 @@ async def send_message(client: TelegramClient, chat: Chat, promo_script: PromoSc
         await client.disconnect()
 
     return msg
+
+
+def get_link_on_message(chat: Chat, message_id: int):
+    if chat.username:
+        return f'https://t.me/{chat.username}/{message_id}'
+    elif not chat.username:
+        return f'https://t.me/c/{chat.id}/{message_id}'
 
 
 if __name__ == '__main__':
