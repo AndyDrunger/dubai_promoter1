@@ -78,6 +78,7 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
     }
 
     timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
+    logger.info(f'Chat ID: {chat_id}, timeout: {timeout}')
     await asyncio.sleep(timeout)
 
     await publish_msg(
