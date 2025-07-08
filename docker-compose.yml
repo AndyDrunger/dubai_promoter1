@@ -43,18 +43,17 @@ services:
       - .env
     networks:
       - rabbitmq_net
-#
-#
-#
-#  reactioner:
-#    build:
-#      context: ./
-#      dockerfile: reactioner/Dockerfile
-#    container_name: reactioner
-#    env_file:
-#      - .env
-#    networks:
-#      - rabbitmq_net
+
+
+  reactioner:
+    build:
+      context: .
+      dockerfile: reactioner/Dockerfile
+    container_name: reactioner
+    env_file:
+      - .env
+    networks:
+      - rabbitmq_net
 
 
 networks:

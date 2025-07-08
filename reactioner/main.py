@@ -51,7 +51,7 @@ async def main(payload: dict):
         raise
 
 
-    await update_acc_status(acc_id=acc.id, status=AccStatus.working)
+    # await update_acc_status(acc_id=acc.id, status=AccStatus.working)
 
     chat, promo_script = await load_entities(chat_id, promo_script_data)
     client = await create_tg_client(acc)
@@ -61,9 +61,11 @@ async def main(payload: dict):
         client=client,
         chat=chat,
         acc_id=acc.id,
-        ask_msg_id=promo_script.ask_msg_id,
+        response_msg_id=promo_script.response_msg_id,
         emoji=emoji
     )
+
+    return
 
 
 def parse_payload(payload: dict) -> tuple[int, dict]:
@@ -75,26 +77,35 @@ async def load_entities(chat_id: int, promo_script_data: dict) -> tuple[Chat, Pr
     promo_script = await get_promo_script(promo_script_data['id'])
     promo_script.ask_msg_id = promo_script_data['ask_msg_id']
     promo_script.ask_acc_id = promo_script_data['ask_acc_id']
+    promo_script.response_msg_id = promo_script_data['response_msg_id']
     return chat, promo_script
 
 
-async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, ask_msg_id: int, emoji: str) -> Updates | None:
+async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, response_msg_id: int, emoji: str) -> Updates | None:
     try:
+        await client.connect()
+
         reaction = await client(SendReactionRequest(
-            peer=chat.sg_id,  # может быть ID, username или объект чата
-            msg_id=ask_msg_id,  # ID сообщения
+            peer='promo_SCRIPT',  # может быть ID, username или объект чата
+            msg_id=response_msg_id,  # ID сообщения
             reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
         ))
-        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
-    except MessageIdInvalidError as e:
-        # print(f'Message id invalid, acc_id: {acc_id}, chat_id: {chat.id}', e)
-        await update_acc_status(acc_id=acc_id, status=AccStatus.free)
-        raise
+    #     reaction = await client(SendReactionRequest(
+    #         peer=chat.sg_id,  # может быть ID, username или объект чата
+    #         msg_id=response_msg_id,  # ID сообщения
+    #         reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
+    #     ))
+    #     await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+    #
+    # except MessageIdInvalidError as e:
+    #     # print(f'Message id invalid, acc_id: {acc_id}, chat_id: {chat.id}', e)
+    #     await update_acc_status(acc_id=acc_id, status=AccStatus.free)
+    #     raise
 
     except Exception as e:
-        # print(f'Cant send reaction, acc_id: {acc_id}, chat_id: {chat.id}', e)
-        await update_acc_status(acc_id=acc_id, status=AccStatus.problem)
+        print(f'Cant send reaction, acc_id: {acc_id}, chat_id: {chat.id}', e)
+        # await update_acc_status(acc_id=acc_id, status=AccStatus.problem)
         raise
 
     finally:

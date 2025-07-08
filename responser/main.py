@@ -79,7 +79,7 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
     }
 
     timeout = random.randint(int(os.getenv('REACTION_TIMEOUT_MIN')), int(os.getenv('REACTION_TIMEOUT_MAX')))
-    # await asyncio.sleep(timeout)
+    await asyncio.sleep(timeout)
 
     await publish_msg(
         exchange=exchange,
