@@ -36,6 +36,7 @@ async def startup():
 async def main(payload: dict):
     chat_id, promo_script_data = parse_payload(payload)
     ask_acc_id = promo_script_data['ask_acc_id']
+    response_msg_id = promo_script_data['response_msg_id']
 
     print(f'Chat ID: {chat_id}, Promo script: {promo_script_data}')
 
@@ -55,7 +56,7 @@ async def main(payload: dict):
 
     # await update_acc_status(acc_id=acc.id, status=AccStatus.working)
 
-    chat, promo_script = await load_entities(chat_id, promo_script_data)
+    chat = await load_entities(chat_id)
     client = await create_tg_client(acc)
     emoji = get_emoji()
 
@@ -63,7 +64,7 @@ async def main(payload: dict):
         client=client,
         chat=chat,
         acc_id=acc.id,
-        response_msg_id=promo_script.response_msg_id,
+        response_msg_id=response_msg_id,
         emoji=emoji
     )
 
@@ -74,13 +75,9 @@ def parse_payload(payload: dict) -> tuple[int, dict]:
     return payload['chat_id'], payload['promo_script']
 
 
-async def load_entities(chat_id: int, promo_script_data: dict) -> tuple[Chat, PromoScript]:
+async def load_entities(chat_id: int) -> Chat:
     chat = await get_chat(chat_id)
-    promo_script = await get_promo_script(promo_script_data['id'])
-    promo_script.ask_msg_id = promo_script_data['ask_msg_id']
-    promo_script.ask_acc_id = promo_script_data['ask_acc_id']
-    promo_script.response_msg_id = promo_script_data['response_msg_id']
-    return chat, promo_script
+    return chat
 
 
 async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, response_msg_id: int, emoji: str) -> Updates | None:
