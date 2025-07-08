@@ -90,11 +90,11 @@ async def send_reaction(client: TelegramClient, chat: Chat, acc_id: int, respons
             reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
         ))
 
-        reaction = await client(SendReactionRequest(
-            peer=chat.sg_id,  # может быть ID, username или объект чата
-            msg_id=response_msg_id,  # ID сообщения
-            reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
-        ))
+        # reaction = await client(SendReactionRequest(
+        #     peer=chat.sg_id,  # может быть ID, username или объект чата
+        #     msg_id=response_msg_id,  # ID сообщения
+        #     reaction=[ReactionEmoji(emoticon=emoji)],  # можно заменить на другую реакцию
+        # ))
         await update_acc_status(acc_id=acc_id, status=AccStatus.free)
 
     except MessageIdInvalidError as e:
