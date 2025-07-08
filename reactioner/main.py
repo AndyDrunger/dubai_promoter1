@@ -37,6 +37,9 @@ async def main(payload: dict):
     chat_id, promo_script_data = parse_payload(payload)
     ask_acc_id = promo_script_data['ask_acc_id']
 
+    print(f'Chat ID: {chat_id}, Promo script: {promo_script_data}')
+    return
+
     acc = await get_acc(ask_acc_id)
 
     is_eligible = (
