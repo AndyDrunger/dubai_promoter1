@@ -54,7 +54,7 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
     ]
 
     if not eligible_accs:
-        raise
+        raise RuntimeError(f'Нет доступных аккаунтов для чата {chat_id}')
 
     acc = random.choice(eligible_accs)
     await update_acc_status(acc_id=acc.id, status=AccStatus.working)

@@ -51,7 +51,7 @@ async def main(payload: dict):
     )
 
     if not is_eligible:
-        raise
+        raise RuntimeError(f'Нет доступных аккаунтов для чата {chat_id}')
 
 
     await update_acc_status(acc_id=acc.id, status=AccStatus.working)
