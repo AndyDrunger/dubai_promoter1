@@ -54,6 +54,7 @@ async def schedule(chat_id: int, exchange: Exchange):
             'promo_script_id': random_promo_script.id,
         }
 
+
         await publish_msg(payload=payload,
                           routing_key=os.getenv('ASK_DELAY_QUEUE_ROUTING_KEY'),
                           exchange=exchange,
