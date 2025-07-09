@@ -48,10 +48,6 @@ async def startup():
 async def main(payload: dict, exchange: AbstractRobustExchange):
     chat_id, promo_script_id = parse_payload(payload)
 
-    logger.info(payload['time'])
-
-    return
-
     accs = await get_accs()
 
 
