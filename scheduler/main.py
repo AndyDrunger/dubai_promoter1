@@ -52,6 +52,7 @@ async def schedule(chat_id: int, exchange: Exchange):
         payload = {
             'chat_id': chat_id,
             'promo_script_id': random_promo_script.id,
+            'time': timeout,
         }
 
         await publish_msg(payload=payload,
