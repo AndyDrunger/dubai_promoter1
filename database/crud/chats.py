@@ -20,17 +20,19 @@ async def create_chat(id: int, captcha: bool = False, username: str = None, inv_
 
 async def get_chats() -> list[Chat]:
     async with async_session() as session:
-        query = select(ChatsModel)
-        result = await session.execute(query)
-        chat_models = result.unique().scalars().all()
+        async with session.begin():
+            query = select(ChatsModel)
+            result = await session.execute(query)
+            chat_models = result.unique().scalars().all()
 
-        return [map_model_to_business(chat, Chat) for chat in chat_models]
+            return [map_model_to_business(chat, Chat) for chat in chat_models]
 
 
 async def get_chat(id: int) -> Chat:
     async with async_session() as session:
-        query = select(ChatsModel).where(ChatsModel.id == id)
-        result = await session.execute(query)
-        chat_model = result.unique().scalars().one()
+        async with session.begin():
+            query = select(ChatsModel).where(ChatsModel.id == id)
+            result = await session.execute(query)
+            chat_model = result.unique().scalars().one()
 
-        return map_model_to_business(chat_model, Chat)
+            return map_model_to_business(chat_model, Chat)

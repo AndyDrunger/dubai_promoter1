@@ -18,17 +18,19 @@ async def create_ask_response(ask_id: int, response_id: int) -> AsksResponsesMod
 
 async def get_promo_scripts() -> list[PromoScript]:
     async with async_session() as session:
-        query = select(AsksResponsesModel)
-        result = await session.execute(query)
-        asks_responses_models = result.unique().scalars().all()
+        async with session.begin():
+            query = select(AsksResponsesModel)
+            result = await session.execute(query)
+            asks_responses_models = result.unique().scalars().all()
 
-        return [map_asks_responses_to_promo_script(ar) for ar in asks_responses_models]
+            return [map_asks_responses_to_promo_script(ar) for ar in asks_responses_models]
 
 
 async def get_promo_script(id: int) -> PromoScript:
     async with async_session() as session:
-        query = select(AsksResponsesModel).where(AsksResponsesModel.id == id)
-        result = await session.execute(query)
-        asks_responses_model = result.unique().scalars().one()
+        async with session.begin():
+            query = select(AsksResponsesModel).where(AsksResponsesModel.id == id)
+            result = await session.execute(query)
+            asks_responses_model = result.unique().scalars().one()
 
-        return map_asks_responses_to_promo_script(asks_responses_model)
+            return map_asks_responses_to_promo_script(asks_responses_model)

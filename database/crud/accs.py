@@ -20,20 +20,22 @@ async def create_acc(id: int, api_id: int, api_hash: str, proxy_id: int, profile
 
 async def get_accs() -> list[Acc]:
     async with async_session() as session:
-        query = select(AccsModel)
-        result = await session.execute(query)
-        acc_models = result.unique().scalars().all()
+        async with session.begin():
+            query = select(AccsModel)
+            result = await session.execute(query)
+            acc_models = result.unique().scalars().all()
 
-        return [map_acc_model_to_business(acc) for acc in acc_models]
+            return [map_acc_model_to_business(acc) for acc in acc_models]
 
 
 async def get_acc(id: int) -> Acc:
     async with async_session() as session:
-        query = select(AccsModel).where(AccsModel.id == id)
-        result = await session.execute(query)
-        acc_model = result.scalars().first()
+        async with session.begin():
+            query = select(AccsModel).where(AccsModel.id == id)
+            result = await session.execute(query)
+            acc_model = result.scalars().first()
 
-        return map_acc_model_to_business(acc_model)
+            return map_acc_model_to_business(acc_model)
 
 
 async def update_acc_status(acc_id: int, status: AccStatus) -> None:
