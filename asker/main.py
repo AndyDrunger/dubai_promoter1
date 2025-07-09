@@ -78,13 +78,13 @@ async def main(payload: dict, exchange: AbstractRobustExchange):
 
     logger.info(f"ACC_ID: {acc.id} - CHAT_ID: {chat.id} - SUCCESSFUL SENT ANSWER: {promo_script.ask.text}")
 
-    asyncio.create_task(post_work(
+    await post_work(
         chat=chat,
         promo_script=promo_script,
         msg=msg,
         acc=acc,
         exchange=exchange,
-    ))
+    )
 
     # payload = {
     #     'chat_id': chat.id,
